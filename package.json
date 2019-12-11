@@ -4,13 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --require babel-register ./mocha.conf.js server --recursive --exclude server/index.js"
+    "test": "cross-env NODE_ENV=development mocha --require babel-register ./mocha.conf.js server --recursive --exclude server/index.js",
+    "prod": "cross-env NODE_ENV=production node dist/index.js",
+    "dev": "cross-env NODE_ENV=development nodemon --watch server server/index.js --exec babel-node",
+    "prebuild": "rimraf dist",
+    "postbuild": "cp -Rp package.json dist",
+    "build": "babel server -d dist"
   },
   "author": "Virginie BARDALES",
   "license": "ISC",
   "dependencies": {
     "babel-polyfill": "^6.26.0",
-    "bluebird": "^3.7.2"
+    "bluebird": "^3.7.2",
+    "cross-env": "^6.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -21,6 +27,8 @@
     "chai-as-promised": "^7.1.1",
     "dirty-chai": "^2.0.1",
     "mocha": "^6.2.2",
+    "nodemon": "^2.0.1",
+    "rimraf": "^3.0.0",
     "sinon": "^7.5.0",
     "sinon-chai": "^3.3.0"
   }
