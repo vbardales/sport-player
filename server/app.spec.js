@@ -3,6 +3,7 @@ import * as appFn from './app';
 import * as Server from './components/server';
 import * as indexAction from './api/index';
 import * as findAction from './api/find';
+import * as getAction from './api/get';
 
 describe('app', () => {
   describe('default', () => {
@@ -24,6 +25,7 @@ describe('app', () => {
       sinon.stub(appFn, 'stop').resolves();
       sinon.stub(indexAction, 'default').returns({ method: 'index' });
       sinon.stub(findAction, 'default').returns({ method: 'find' });
+      sinon.stub(getAction, 'default').returns({ method: 'get' });
     });
 
     afterEach(() => {
@@ -31,6 +33,7 @@ describe('app', () => {
       appFn.stop.restore();
       indexAction.default.restore();
       findAction.default.restore();
+      getAction.default.restore();
     });
 
     it('should exist and be a function', () => {
@@ -58,6 +61,12 @@ describe('app', () => {
       await start(app, config);
       expect(findAction.default).to.have.been.calledOnce();
       expect(server.addRoute).to.have.been.called().and.calledWith('find');
+    });
+
+    it('should register get action', async () => {
+      await start(app, config);
+      expect(getAction.default).to.have.been.calledOnce();
+      expect(server.addRoute).to.have.been.called().and.calledWith('get');
     });
 
     it('should declare a db', async () => {

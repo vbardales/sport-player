@@ -40,8 +40,16 @@ export default class Server {
     }
 
     this.expressApp[normalizedMethod](uri, async (req, res) => {
-      const data = await controller(req, res);
-      res.json(data);
+      try {
+        const data = await controller(req, res);
+        res.json(data);
+      } catch (e) {
+        res.status(_.get(e, 'status', 500)).json({
+          status: _.get(e, 'status', 500),
+          errCode: _.get(e, 'errCode', 'UNEXPECTED_ERROR'),
+          error: e.message,
+        });
+      }
     });
     console.log(`Registered ${method} ${uri} controller`);
   }

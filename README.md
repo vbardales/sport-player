@@ -25,3 +25,4 @@ Launch unit tests:
 - linter
 - real loggers instead of console (no log in test env for instance)
 - custom errors (not just JS Error)
+- server handle already sent responses

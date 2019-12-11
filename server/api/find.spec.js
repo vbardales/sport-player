@@ -25,13 +25,13 @@ describe('find action', () => {
     let app;
     const config = {};
     const obj1 = {
-      id: '1',
+      id: 1,
     };
     const obj2 = {
-      id: '2',
+      id: 2,
     };
     const obj3 = {
-      id: '3',
+      id: 3,
     };
     const db = [obj3, obj1, obj2];
 

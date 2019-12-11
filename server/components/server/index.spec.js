@@ -76,6 +76,7 @@ describe('Server', () => {
       const req = {};
       const res = {
         json: _.noop,
+        status: () => res,
       };
       const data = {};
 
@@ -111,6 +112,42 @@ describe('Server', () => {
         controller.resolves(data);
         await handler(req, res);
         expect(res.json).to.have.been.calledOnce().and.calledWith(data);
+      });
+
+      it('should not return data but error as json if controller throws', async () => {
+        const error = new Error('Unexpected error');
+        error.status = 403;
+        error.errCode = 'DIFFERENT FROM DEFAULTED';
+        controller.throws(error);
+        await handler(req, res);
+        expect(res.json).to.have.been.calledOnce().and.calledWith({
+          status: 403,
+          errCode: 'DIFFERENT FROM DEFAULTED',
+          error: 'Unexpected error'
+        });
+      });
+
+      it('should not return data but error as json if controller throws even if async', async () => {
+        const error = new Error('Unexpected error');
+        error.status = 403;
+        error.errCode = 'DIFFERENT FROM DEFAULTED';
+        controller.rejects(error);
+        await handler(req, res);
+        expect(res.json).to.have.been.calledOnce().and.calledWith({
+          status: 403,
+          errCode: 'DIFFERENT FROM DEFAULTED',
+          error: 'Unexpected error'
+        });
+      });
+
+      it('should default error if all data are not present', async () => {
+        controller.rejects(new Error('Unexpected error'));
+        await handler(req, res);
+        expect(res.json).to.have.been.calledOnce().and.calledWith({
+          status: 500,
+          errCode: 'UNEXPECTED_ERROR',
+          error: 'Unexpected error'
+        });
       });
     });
 
