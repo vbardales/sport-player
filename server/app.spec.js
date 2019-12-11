@@ -1,6 +1,8 @@
 import app, { start, stop } from './app';
 import * as appFn from './app';
 import * as Server from './components/server';
+import * as indexAction from './api/index';
+import * as findAction from './api/find';
 
 describe('app', () => {
   describe('default', () => {
@@ -20,11 +22,15 @@ describe('app', () => {
       server.start.resolves();
       sinon.stub(Server, 'default').callsFake(() => server);
       sinon.stub(appFn, 'stop').resolves();
+      sinon.stub(indexAction, 'default').returns({ method: 'index' });
+      sinon.stub(findAction, 'default').returns({ method: 'find' });
     });
 
     afterEach(() => {
       Server.default.restore();
       appFn.stop.restore();
+      indexAction.default.restore();
+      findAction.default.restore();
     });
 
     it('should exist and be a function', () => {
@@ -40,6 +46,23 @@ describe('app', () => {
     it('should start server', async () => {
       await start(app, config);
       expect(server.start).to.have.been.calledOnce();
+    });
+
+    it('should register index action', async () => {
+      await start(app, config);
+      expect(indexAction.default).to.have.been.calledOnce();
+      expect(server.addRoute).to.have.been.called().and.calledWith('index');
+    });
+
+    it('should register find action', async () => {
+      await start(app, config);
+      expect(findAction.default).to.have.been.calledOnce();
+      expect(server.addRoute).to.have.been.called().and.calledWith('find');
+    });
+
+    it('should declare a db', async () => {
+      await start(app, config);
+      expect(app).to.have.property('db');
     });
 
     it('should gracefully stop if an error occurred during startup', async () => {

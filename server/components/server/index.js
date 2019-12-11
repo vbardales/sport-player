@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import methodOverride from 'method-override';
 import http from 'http';
 import Promise from 'bluebird';
+import _ from 'lodash';
 
 export default class Server {
   constructor(ip, port) {
@@ -25,6 +26,24 @@ export default class Server {
     this.server = http.createServer(this.expressApp);
     this.stream = null;
     this.isUp = false;
+  }
+
+  addRoute(method, uri, controller) {
+    if (this.isUp) {
+      console.warn('Server is already started, please switch it off to add routes');
+      return;
+    }
+
+    const normalizedMethod = _.toLower(method);
+    if (!_.includes(['get', 'post', 'put', 'delete'], normalizedMethod)) {
+      throw new Error(`Unknown HTTP method: ${normalizedMethod}`);
+    }
+
+    this.expressApp[normalizedMethod](uri, async (req, res) => {
+      const data = await controller(req, res);
+      res.json(data);
+    });
+    console.log(`Registered ${method} ${uri} controller`);
   }
 
   async start() {
