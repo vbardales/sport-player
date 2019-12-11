@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 
 import Server from './components/server';
+import DB from './components/db';
 import indexAction from './api/index';
 import findAction from './api/find';
 import getAction from './api/get';
@@ -14,7 +15,7 @@ export async function start(app, config) {
   const server = new Server(config.ip, config.port);
   app.server = server;
 
-  app.db = require('./components/db/fixtures.json').players;
+  app.db = new DB(config.queryUrl, require('./fixtures.json').players);
 
   const index = indexAction(app, config);
   const find = findAction(app, config);

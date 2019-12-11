@@ -3,7 +3,7 @@ import _ from 'lodash';
 export default (app, config) => ({
   method: 'GET',
   uri: '/players/:id',
-  controller: (req) => {
+  controller: async (req) => {
 
     const id = _.parseInt(req.params.id);
     if (_.isNaN(id)) {
@@ -13,7 +13,8 @@ export default (app, config) => ({
       throw error;
     }
 
-    const player = _.find(app.db, { id });
+    const db = await app.db.get();
+    const player = _.find(db, { id });
     if (player) {
       return player;
     }

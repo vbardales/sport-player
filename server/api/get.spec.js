@@ -33,7 +33,9 @@ describe('get action', () => {
     const obj3 = {
       id: 3,
     };
-    const db = [obj3, obj1, obj2];
+    const db = {
+      get: async () => [obj3, obj1, obj2],
+    };
     const res = {
       status: () => res,
       json: () => res,
@@ -49,16 +51,16 @@ describe('get action', () => {
       expect(controller).to.exist().and.be.a('Function');
     });
 
-    it('should throw and send if input is not a right input', () => {
-      expect(() => controller({ params: { id: 'notANumber' }}, res)).to.throw('ID "notANumber" is not a valid number');
+    it('should throw and send if input is not a right input', async () => {
+      await expect(controller({ params: { id: 'notANumber' }}, res)).to.be.rejectedWith('ID "notANumber" is not a valid number');
     });
 
-    it('should return the found object', () => {
-      expect(controller({ params: { id: 1 }})).to.equal(obj1);
+    it('should return the found object', async () => {
+      expect(await controller({ params: { id: 1 }})).to.equal(obj1);
     });
 
-    it('should throw and send res otherwise', () => {
-      expect(() => controller({ params: { id: '4' }}, res)).to.throw('Player 4 not found');
+    it('should throw and send res otherwise', async () => {
+      await expect(controller({ params: { id: '4' }}, res)).to.be.rejectedWith('Player 4 not found');
     });
   });
 });

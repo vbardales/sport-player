@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=development mocha --require babel-register ./mocha.conf.js server --recursive --exclude server/index.js",
-    "prod": "cross-env NODE_ENV=production node dist/index.js",
+    "start": "cross-env NODE_ENV=production node dist/index.js",
     "dev": "cross-env NODE_ENV=development nodemon --watch server server/index.js --exec babel-node",
     "prebuild": "rimraf dist",
-    "postbuild": "cp -Rp package.json dist",
+    "postbuild": "cp -Rp package.json ./server/fixtures.json dist",
     "build": "babel server -d dist"
   },
   "author": "Virginie BARDALES",
@@ -22,7 +22,9 @@
     "express": "^4.17.1",
     "helmet": "^3.21.2",
     "lodash": "^4.17.15",
-    "method-override": "^3.0.0"
+    "method-override": "^3.0.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

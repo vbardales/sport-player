@@ -33,7 +33,9 @@ describe('find action', () => {
     const obj3 = {
       id: 3,
     };
-    const db = [obj3, obj1, obj2];
+    const db = {
+      get: async () => [obj3, obj1, obj2],
+    };
 
     beforeEach(() => {
       app = {};
@@ -45,8 +47,8 @@ describe('find action', () => {
       expect(controller).to.exist().and.be.a('Function');
     });
 
-    it('should return the db sorted by id', () => {
-      expect(controller()).to.deep.equal([obj1, obj2, obj3]);
+    it('should return the db sorted by id', async () => {
+      expect(await controller()).to.deep.equal([obj1, obj2, obj3]);
     });
   });
 });
