@@ -1,0 +1,58 @@
+import express from 'express';
+import helmet from 'helmet';
+import compression from 'compression';
+import bodyParser from 'body-parser';
+import methodOverride from 'method-override';
+import http from 'http';
+import Promise from 'bluebird';
+
+export default class Server {
+  constructor(ip, port) {
+    this.ip = ip;
+    this.port = port;
+
+    this.expressApp = express();
+
+    this.expressApp.use(helmet());
+    this.expressApp.use(compression());
+
+    this.expressApp.use(bodyParser.urlencoded({ limit: '50mb', extended: false, parameterLimit: 50000 }));
+    this.expressApp.use(bodyParser.json({ limit: '50mb' }));
+    this.expressApp.use(methodOverride());
+    this.expressApp.use(helmet.noCache());
+    this.expressApp.disable('etag');
+
+    this.server = http.createServer(this.expressApp);
+    this.stream = null;
+    this.isUp = false;
+  }
+
+  async start() {
+    if (this.isUp) {
+      return;
+    }
+
+    return new Promise((resolve) => {
+      this.stream = this.server.listen(this.port, this.ip, () => {
+        console.log(`Server listening on ${this.port}`);
+        this.isUp = true;
+        resolve();
+      });
+      this.stream.on('close', () => {
+        console.log('Server closed');
+        this.isUp = false;
+        this.stream = null;
+      });
+    });
+  }
+
+  async stop() {
+    if (!this.isUp) {
+      return;
+    }
+
+    return new Promise((resolve) => {
+      this.stream.close(resolve);
+    });
+  }
+}
